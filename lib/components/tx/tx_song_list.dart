@@ -1,0 +1,258 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nicemusic/components/song_list_contaner.dart';
+import 'package:nicemusic/api/platform_api.dart';
+import 'package:nicemusic/components/songlist_trailing.dart';
+import 'package:nicemusic/model/tx/tx_music_list.dart';
+import 'package:nicemusic/constants/music_platform.dart';
+import 'package:nicemusic/db/playlist_dao.dart';
+import 'package:nicemusic/event/event_bus.dart';
+import 'package:nicemusic/event/player_event.dart';
+import 'package:nicemusic/event/player_state_event.dart';
+import 'package:nicemusic/model/favorite_model.dart';
+import 'package:nicemusic/model/playlist_model.dart';
+import 'package:nicemusic/model/song_query.dart';
+import 'package:nicemusic/store/player_properties_notifier.dart';
+import 'package:nicemusic/components/empty_container.dart';
+import 'package:nicemusic/components/list_more.dart';
+
+/// qq音乐歌曲列表组件
+class TxSongList extends StatefulWidget implements SongListContainer {
+  final PlatformApi api;
+
+  TxSongList({this.api});
+
+  final TxSongListState txSongListState = TxSongListState();
+
+  @override
+  TxSongListState createState() => txSongListState;
+
+  @override
+  void onQuery(String queryStr) {
+    if (queryStr != null && queryStr.isNotEmpty) {
+      txSongListState.query(queryStr);
+    }
+  }
+}
+
+class TxSongListState extends State<TxSongList>
+    with AutomaticKeepAliveClientMixin {
+  // 加载更多状态
+  bool isFinished = false;
+
+  // 歌曲列表
+  List<Result> songs = List();
+
+  ScrollController _scrollCtl = ScrollController();
+
+  // 查询器
+  SongQuery songQuery = SongQuery(conditions: Map());
+
+  // 查询的字符串
+  String queryStr;
+
+  @override
+  void initState() {
+    super.initState();
+    _listenListScroll();
+  }
+
+  // 滚动监听
+  void _listenListScroll() {
+    _scrollCtl.addListener(() {
+      if (_scrollCtl.position.pixels >= _scrollCtl.position.maxScrollExtent &&
+          !isFinished) {
+        // 加载更多
+        _loadMore();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollCtl.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    if (songs.length == 0) {
+      return EmptyContainer(
+          assetName: 'icons/empty_list2.svg', tips: '列表是空的~_~');
+    }
+    return ListView.builder(
+        controller: _scrollCtl,
+        physics: AlwaysScrollableScrollPhysics(),
+        cacheExtent: 10,
+        itemCount: songs.length + 1,
+        itemBuilder: (context, index) {
+          if (index == songs.length) {
+            return ListMore(isEnd: isFinished);
+          }
+          final music = songs[index];
+          return Container(
+            padding: EdgeInsets.only(left: 1),
+            child: Material(
+              child: InkWell(child: _buildListItem(context, music, index)),
+            ),
+          );
+        });
+  }
+
+  void query(String queryStr) {
+    if (this.queryStr == queryStr) return;
+    print('qq搜索：$queryStr');
+    this.queryStr = queryStr;
+    songQuery.page = 1;
+    Map<String, dynamic> conditions = {'queryStr': queryStr};
+    songQuery.conditions = conditions;
+    setState(() {
+      songs.clear();
+    });
+    _getDatas();
+  }
+
+  _getDatas() async {
+    TxMusicList list = await widget.api.getPageList(songQuery);
+    songQuery.total = list.data.song.totalnum;
+    songs.addAll(list.data.song.list);
+    if (songs.length == songQuery.total) {
+      this.isFinished = true;
+    }
+    setState(() {});
+  }
+
+  // 加载更多
+  void _loadMore() {
+    if (songs.length == songQuery.total) {
+      this.isFinished = true;
+      setState(() {});
+      return;
+    }
+    songQuery.page++;
+    _getDatas();
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+
+  Widget _buildListItem(BuildContext context, Result music, int index) {
+    bool isPlaying = false;
+    return ListTile(
+        title: _buildListItemTitle(music),
+        leading: _buildListLeading(index, isPlaying),
+        subtitle: Text(_getSubTitle(music), style: TextStyle(fontSize: 12)),
+        trailing: _getTrailingWidget(music),
+        onTap: () {
+          _playSong(music).then((value) {});
+        });
+  }
+
+  // 构造ListItem title组件
+  Widget _buildListItemTitle(Result music) {
+    return Align(
+        child: Text(music.title,
+            style: TextStyle(fontSize: 14),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis),
+        alignment: Alignment.centerLeft);
+  }
+
+  Widget _buildListLeading(int index, bool isPlaying) {
+    return Container(
+        width: 30,
+        alignment: Alignment.center,
+        child: isPlaying
+            ? SvgPicture.asset('icons/deezer.svg')
+            : Text((index + 1).toString()));
+  }
+
+  _getTrailingWidget(Result music) {
+    FavoriteModel favoriteModel = FavoriteModel(
+        sid: music.id,
+        mid: music.mid,
+        sname: music.title,
+        artists: music.album.title,
+        albumId: music.album.mid.toString(),
+        albumName: music.album.title,
+        source: MusicPlatforms.qq.code);
+    return SongListTrailing(music: favoriteModel, callback: null);
+  }
+
+  // 获取副标题, 歌手-专辑名
+  String _getSubTitle(Result music) {
+    String subTitle = _getArtists(music);
+    if (music.album != null && music.album.name.isNotEmpty) {
+      subTitle += "－" + music.album.name;
+    }
+    return subTitle.toString();
+  }
+
+  String _getArtists(Result music) {
+    List<String> artists = List();
+    music.singer.forEach((s) {
+      artists.add(s.name);
+    });
+    return artists.join('&');
+  }
+
+  // 播放歌曲
+  _playSong(Result music) async {
+    try {
+      eventBus.fire(PlayerStateEvent(state: PlayerStateEnum.CONNECTING));
+      int id = music.id;
+      PlayerProperties playerProperties = PlayerProperties();
+      playerProperties.isLocal = false;
+      playerProperties.sid = id;
+      playerProperties.source = MusicPlatforms.qq.code;
+      playerProperties.mid = music.mid;
+      playerProperties.albumId = music.album.mid.toString();
+      playerProperties.songName = music.title;
+      playerProperties.albumName = music.album.name;
+      playerProperties.artists = _getArtists(music);
+      Map<String, dynamic> params = {
+        'id': id,
+        'mid': music.mid,
+        'albumId': music.album.mid
+      };
+      String playUrl = await widget.api.getPlayUrl(params);
+      playerProperties.url = playUrl;
+      String albumPic = await widget.api.getAlbumPic(params);
+      playerProperties.albumPicUrl = albumPic;
+      String lyric = await widget.api.getLyric(params);
+      playerProperties.lyric = lyric;
+
+      checkPlayListExist(sid: id, source: MusicPlatforms.qq.code).then((pid) {
+        if (pid == null) {
+          // 添加到播放列表
+          PlayListModel data = PlayListModel(
+              sid: id,
+              mid: music.mid,
+              sname: music.title,
+              artists: _getArtists(music),
+              albumId: music.album.mid,
+              albumName: music.album.name,
+              albumPic: playerProperties.albumPicUrl,
+              source: MusicPlatforms.qq.code);
+          return saveToPlayList(data.toJson());
+        } else {
+          return pid;
+        }
+      }).then((pid) {
+        // 触发播放
+        eventBus.fire(PlayerEvent(
+            cmd: PlayerCmd.PLAY, pid: pid, playerProperties: playerProperties));
+      });
+    } catch (e) {
+      eventBus.fire(PlayerStateEvent(state: PlayerStateEnum.ERROR));
+      Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(
+            '获取歌曲信息失败',
+            style: TextStyle(color: Colors.white),
+          ),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red));
+    }
+  }
+}
