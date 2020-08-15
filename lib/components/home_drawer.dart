@@ -66,7 +66,7 @@ class MainDrawer extends StatelessWidget {
             ),
             title: Text('GitHub'),
             onTap: () async {
-              const url = "https://github.com/pizhaojun";
+              const url = "https://github.com/charrypi/nice_music";
               if (await canLaunch(url)) {
                 launch(url);
               }

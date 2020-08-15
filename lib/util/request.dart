@@ -12,7 +12,7 @@ class HttpRequest {
     if (_dio == null) {
       _dio = new Dio(BaseOptions(
           connectTimeout: 30000,
-          receiveTimeout: 3000,
+          receiveTimeout: 10000,
           receiveDataWhenStatusError: false));
 //      _dio.interceptors.add(CookieManager(CookieJar()));
     }
@@ -38,8 +38,10 @@ class HttpRequest {
   }
 
   Future<Response> download(
-      String urlPath, String savePath, ProgressCallback receiveProgress) async {
+      String urlPath, String savePath, ProgressCallback receiveProgress,
+      {CancelToken cancelToken}) async {
     _dio.options.receiveTimeout = 0;
-   return await _dio.download(urlPath, savePath, onReceiveProgress: receiveProgress);
+    return await _dio.download(urlPath, savePath,
+        cancelToken: cancelToken, onReceiveProgress: receiveProgress);
   }
 }
