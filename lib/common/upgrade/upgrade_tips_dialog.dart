@@ -1,7 +1,5 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:nicemusic/common/navkey.dart';
-import 'package:nicemusic/common/upgrade/upgrade_progress_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UpgradeModal extends StatefulWidget {
   final List<String> updateMsgs;
@@ -32,15 +30,8 @@ class _UpgradeModalState extends State<UpgradeModal> {
               style: TextStyle(color: Colors.redAccent),
             )),
         FlatButton(
-          child: Text('升级'),
-          onPressed: () {
-            widget.cancelFunc();
-            BotToast.showAnimationWidget(
-                toastBuilder: (cancel) {
-                  return UpgradeProgressDialog(widget.downloadUrl,cancel);
-                },
-                animationDuration: Duration(seconds: 1));
-          },
+          child: Text('前往下载'),
+          onPressed: () => _goToDownload(),
         )
       ],
     );
@@ -53,5 +44,19 @@ class _UpgradeModalState extends State<UpgradeModal> {
       spans.add(TextSpan(text: "$msg\n"));
     });
     return spans;
+  }
+
+  _goToDownload() async {
+    {
+      widget.cancelFunc();
+      if (await canLaunch(widget.downloadUrl)) {
+        launch(widget.downloadUrl);
+      }
+//            BotToast.showAnimationWidget(
+//                toastBuilder: (cancel) {
+//                  return UpgradeProgressDialog(widget.downloadUrl,cancel);
+//                },
+//                animationDuration: Duration(seconds: 1));
+    }
   }
 }

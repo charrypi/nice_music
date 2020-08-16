@@ -60,7 +60,7 @@ class _UpgradeProgressDialogState extends State<UpgradeProgressDialog> {
       Directory directory = await getTemporaryDirectory();
       savePath = directory.path + "/app.apk";
 
-      await HttpRequest.getInstance().download(widget.downloadUrl, savePath,
+      HttpRequest.getInstance().download(widget.downloadUrl, savePath,
           (count, total) {
         setState(() {
           percent = int.parse((count / total * 100).toStringAsFixed(0));
@@ -70,7 +70,7 @@ class _UpgradeProgressDialogState extends State<UpgradeProgressDialog> {
           widget.cancel();
           _instalApk();
         }
-      }, cancelToken: _cancelToken);
+      });
     } catch (e, s) {
       print(e);
       print(s);
