@@ -25,51 +25,53 @@ class _PlayListModalState extends State<PlayListModal> {
           child: Column(
             children: <Widget>[
               Container(
-                alignment: Alignment.centerLeft,
-                margin: EdgeInsets.all(5),
-                child: Text(
-                  "播放列表(${datas.length})",
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-              Divider(),
+            alignment: Alignment.centerLeft,
+            margin: EdgeInsets.all(5),
+          child: Text(
+            "播放列表(${datas.length})",
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+      Divider(),
               datas.length == 0
                   ? Align(
                       child: Text('列表空空如也~',style: TextStyle(fontSize: 15),),
                     )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: datas.length,
-                      itemBuilder: (context, index) {
-                        PlayListModel model = datas[index];
-                        return ListTile(
-                          leading: Container(
-                            width: 30,
-                            alignment: Alignment.center,
-                            child: Text(
-                              (index + 1).toString(),
-                              style: TextStyle(fontSize: 18),
-                            ),
+                  : Expanded(
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: datas.length,
+                    itemBuilder: (context, index) {
+                      PlayListModel model = datas[index];
+                      return ListTile(
+                        leading: Container(
+                          width: 30,
+                          alignment: Alignment.center,
+                          child: Text(
+                            (index + 1).toString(),
+                            style: TextStyle(fontSize: 18),
                           ),
-                          title: RichText(
-                              text: TextSpan(
-                                  style: TextStyle(color: Colors.black),
-                                  children: <TextSpan>[
-                                TextSpan(
-                                    text: model.sname,
-                                    style: TextStyle(fontSize: 16)),
-                                TextSpan(
-                                    text: '\t\t\t${model.source}',
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.blue))
-                              ])),
-                          subtitle: Text(_getSubTitle(model)),
-                          trailing: IconButton(
-                              icon: Icon(Icons.clear),
-                              onPressed: () => _remove(model)),
-                          onTap: () => _play(model),
-                        );
-                      })
+                        ),
+                        title: RichText(
+                            text: TextSpan(
+                                style: TextStyle(color: Colors.black),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                      text: model.sname,
+                                      style: TextStyle(fontSize: 16)),
+                                  TextSpan(
+                                      text: '\t\t\t${model.source}',
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.blue))
+                                ])),
+                        subtitle: Text(_getSubTitle(model)),
+                        trailing: IconButton(
+                            icon: Icon(Icons.clear),
+                            onPressed: () => _remove(model)),
+                        onTap: () => _play(model),
+                      );
+                    })
+              )
             ],
           ),
         ));
