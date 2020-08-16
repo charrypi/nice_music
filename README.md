@@ -10,33 +10,33 @@
 
 1. 主页
 
-   <img src="docs\images\home.png" alt="home" style="zoom: 33%;" />
+   <center><figure><img src="docs\images\home.png" alt="home" style="float:left;width:250px"/><img src="docs\images\home (2).png" alt="home (2)" style="float:left;width:250px" /></figure></center>
 
-   <img src="docs\images\home (2).png" alt="home (2)" style="zoom:33%;" />
+   
 
    
 
 2. 音乐搜索
 
-   <img src="docs\images\search.png" alt="search" style="zoom:33%;" />
+   <img src="docs\images\search.png" alt="search" style="float:left;width:250px" />
 
 3. 播放列表
 
-   <img src="docs\images\playlist.png" alt="playlist" style="zoom:33%;" />
+   <img src="docs\images\playlist.png" alt="playlist" style="float:left;width:250px" />
 
 4. 收藏列表
 
-   <img src="docs\images\favorite.png" alt="favorite" style="zoom:33%;" />
+   <img src="docs\images\favorite.png" alt="favorite" style="float:left;width:250px" />
 
 5. 下载列表
 
-   <img src="docs\images\download.png" alt="download" style="zoom:33%;" />
+   <img src="docs\images\download.png" alt="download" style="float:left;width:250px" />
 
 6. 播放详情页面
 
-   <img src="docs\images\playview.png" alt="playview" style="zoom:33%;" />
+   <center><figure><img src="docs\images\playview.png" alt="playview" style="float:left;width:250px" /><img src="docs\images\playlistInplayView.png" alt="playlistInplayView" style="float:left;width:250px"/></figure></center>
 
-   <img src="docs\images\playlistInplayView.png" alt="playlistInplayView" style="zoom:33%;" />
+   
 
    ---
 
