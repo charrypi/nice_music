@@ -36,6 +36,10 @@
 
    <center><figure><img src="docs\images\playview.png" alt="playview" style="float:left;width:250px" /><img src="docs\images\playlistInplayView.png" alt="playlistInplayView" style="float:left;width:250px"/></figure></center>
 
+   7. 设置页面
+
+      <img src="docs\images\settings.png" alt="settings" style="float:left;width:250px" />
+
    
 
    ---
