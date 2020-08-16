@@ -10,7 +10,7 @@
 
 1. 主页
 
-   <center><figure><img src="docs\images\home.png" alt="home" style="float:left;width:250px"/><img src="docs\images\home (2).png" alt="home (2)" style="float:left;width:250px" /></figure></center>
+   <center><figure><img src="docs\images\home.png" alt="home" style="float:left;width:250px"/>  <img src="docs\images\home (2).png" alt="home (2)" style="float:left;width:250px" /></figure></center>
 
    
 
@@ -34,11 +34,11 @@
 
 6. 播放详情页面
 
-   <center><figure><img src="docs\images\playview.png" alt="playview" style="float:left;width:250px" /><img src="docs\images\playlistInplayView.png" alt="playlistInplayView" style="float:left;width:250px"/></figure></center>
+   <center><figure><img src="docs\images\playview.png" alt="playview" style="float:left;width:250px" />  <img src="docs\images\playlistInplayView.png" alt="playlistInplayView" style="float:left;width:250px"/></figure></center>
 
    7. 设置页面
 
-      <img src="docs\images\settings.png" alt="settings" style="float:left;width:250px" />
+   <img src="docs\images\settings.png" alt="settings" style="float:left;width:250px" />
 
    
 
