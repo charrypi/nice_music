@@ -1,5 +1,5 @@
 {
-  "version":"1.0.1",
-  "updateMsgs":["1.更新信息1","2.更新信息2"],
+  "version":"1.0.0",
+  "updateMsgs":"",
   "downloadUrl":"https://github.com/charrypi/nice_music/releases"
 }
